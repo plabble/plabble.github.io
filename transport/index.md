@@ -4,10 +4,10 @@
 ---
 
 The Plabble Transport Protocol (**PTP**) uses a special transport codec for the delivery of the packets between clients and servers. There are two types of transport packets:
-[Request Packets](#request-packet) and [Response Packets](#response-packet). The packets are sized dynamically using flags and length attributes to reduce the size of the packets to a minimum.
+[Request Packets](#request-packet) and [Response Packets](#response-packet). The packets are sized dynamically using [flags](#request-flags) and length attributes to reduce the size of the packets to a minimum.
 
 ### **Bucket storage**
-A Plabble server stores the data in **buckets**. You can see a bucket as a key-value slot on a server with an authorization system to prevent access to users that do not own the secret key. Every bucket consists of a list with a maximum of 65,535 slots. You can add, edit or remove slots from/to a bucket. Thanks to a **permission system** it is possible to add access restrictions to a bucket, so you can make buckets immutable or unreadable for users without the authorization key. The bucket storage system can optionally be used for multiple purposes on top of multiple protocols because the server acts as a key-value storage system.
+A Plabble server stores the data in **buckets**. You can see a bucket as a key-value slot on a server with an authorization system to prevent access to users that do not own the secret key. Every bucket consists of a list with a maximum of 65,536 slots. You can add, edit or remove slots from/to a bucket. Thanks to a **permission system** it is possible to add access restrictions to a bucket, so you can make buckets immutable or unreadable for users without the authorization key. The bucket storage system can optionally be used for multiple purposes on top of multiple protocols because the server acts as a key-value storage system.
 
 ---
 
@@ -27,7 +27,7 @@ _Figure B: Type/Flag bitmap. First 4 bits are the type, the last 4 bits are the 
 ---
 
 In _Figure A_ the byte map of the Plabble Request Packet is shown. The packets consists of the following parts:
-- The **Length**, a [dynamically sized](#dynamically-sized-length) 7 - 28 bits number that indicates the size of the packet in bytes. (this does not include the length of the _Length_ field itself, just the size of the following data). The length is excluded if a protocol is used that already uses a length (like _WebSocket_)
+- The **Length**, a [dynamically sized](#dynamically-sized-length) 7 - 28 bits unsigned number that indicates the size of the packet in bytes. (this does not include the length of the _Length_ field itself, just the size of the following data). The length is excluded if a protocol is used that already uses a length (like _WebSocket_)
 - The **header**, which consists of the following fields:
     - **Type** and **Flag**, 4 bits each (first 4 bits indicate the [packet type](#packet-types) and the last 4 bits are the packet flags, see _Figure B_. The flags are different per packet type, except flag #5 which is reserved for the MAC. See [request flags](#request-flags).)
     - The dynamic **header fields** which depend on the packet type, see [packet types](#packet-types)
@@ -41,19 +41,19 @@ In _Figure A_ the byte map of the Plabble Request Packet is shown. The packets c
 
 _Figure C: Plabble Response Packet_
 - *: The length is [dynamically sized](#dynamically-sized-length) and not always included
-- **: The first bit of the status is used to toggle the MAC. The resulting 7 bits are the [status code](#response-codes)
-- ***: The MAC is optional, it's toggled with the first bit of the status byte.
+- **: The last bit of the status is used to toggle the MAC. The first 7 bits are the [status code](#response-codes)
+- ***: The MAC is optional, it's toggled with the last bit on the status byte.
 
 ![Status bitmap](/img/transport-status-bitmap.drawio.png)
 
-_Figure D: Status code bitmap. First bit is used to indicate if MAC is present (used as flag), other 7 bits are used for the 7-bit status code_
+_Figure D: Status code bitmap. Last bit is used to indicate if MAC is present (used as flag), first 7 bits are used for the 7-bit status code_
 
 ---
 
 In _Figure C_ the byte map of the Plabble Response Packet is shown. The packets consists of the following parts:
-- The **Length**, a [dynamically sized](#dynamically-sized-length) 7 - 28 bits number that indicates the size of the packet in bytes. (this does not include the length of the _Length_ field itself, just the size of the following data). The length is excluded if a protocol is used that already uses a length (like _WebSocket_)
+- The **Length**, a [dynamically sized](#dynamically-sized-length) 7 - 28 bits unsigned number that indicates the size of the packet in bytes. (this does not include the length of the _Length_ field itself, just the size of the following data). The length is excluded if a protocol is used that already uses a length (like _WebSocket_)
 - The **header**, which consists of the following fields:
-    - The 1-byte **status** field, which consists of a 1-bit flag that toggles the MAC and a 7-bit [status code](#response-codes) (see _Figure D_).
+    - The 1-byte **status** field, which consists of a 7-bit [status code](#response-codes) and a 1-bit flag that toggles the MAC (see _Figure D_).
     - The unsigned 2-byte (16 bits) **message counter** is used to keep track on the sended and received messages and it is used to randomize the keys used for the encryption of the packet or MAC. The client and the server both keep two [counters](#counters) (client and server counter). The counter field in the response is the count of the packet it is a response to, so you can keep track on the messages you've sent to map requests and responses.
     - The dynamic **header fields** which depend on the packet type, see [packet types](#packet-types)
 - The **body**, which is a variable length field
@@ -68,7 +68,7 @@ There are several types of packets specified in the protocol, with also a bunch 
 | Name | Value | Description |
 |---|---|--|
 | **[CONNECT](./connect.md)** | 0 | Start session on a  server
-| **[CREATE]()** | 1 | Create a new bucket
+| **[CREATE](./create.md)** | 1 | Create a new bucket
 | **[PUT]()** | 2 | Put a value to a bucket
 | **[WIPE]()** | 3 | Wipe one or more values from the bucket
 | **[REQUEST]()** | 4 | Read one or more values from the bucket
@@ -145,7 +145,7 @@ Encryption of packets in PTP is optional, because Plabble also allows the usage 
 
 _Figure E: Authentication data bytemap_
 
-The data passed in the **MAC** (Message Authentication Code) or **AD** (Associated Data) contains the following fields (see _Figure E_):
+The data hashed in the **MAC** (Message Authentication Code) or **AD** (Associated Data) contains the following fields (see _Figure E_):
 
 - **Header values**: The packet header: type/flag and header fields for a request and the status, counter and header fields for the response. Size can differ
 - Optionally a **body hash**, a `SHA-256` hash of the body (32 bytes). This body hash is only included when **no encryption is used** to ensure integrity on the body data
@@ -165,7 +165,7 @@ The keys used to encrypt the packet are generated using a Key Derivation Functio
 These two keys are generated because it is not secure to reuse keys with the same nonce when using `chacha20` (we use an empty byte array of 12 bytes as nonce at this point). When encrypting the packet we use _Key 0_ to encrypt the header and _Key 1_ to encrypt the body. If no encryption is used, _Key 0_ is used to generate the MAC. Because the counter differs every time, different encryption keys are used for every packet.
 
 ### Counters
-The client and the server both keep two counters which are stored in a 2-byte unsigned integer each, a **client counter** and a **server counter**. These counters are used as a _nonce_ in the Key Derivation Function (KDF) to generate a shared secret that differs every time. To encrypt the data or create a MAC the counters are used to [generate a key](#mac-and-encryption-keys). A client or server always uses his own counter when sending a message to the other party. Because they both keep the two counters, the counter of the other party is also known. After each message sent to the other party own counter is incremented. After each message that is received from the other party, the other counter is incremented, so a counter increments after the processing of a message.
+The client and the server both keep two counters which are stored in a 2-byte unsigned integer (uint-16) each, a **client counter** and a **server counter**. These counters are used as a _nonce_ in the Key Derivation Function (KDF) to generate a shared secret that differs every time and to keep track on requests/responses. To encrypt the data or create a MAC the counters are used to [generate a key](#mac-and-encryption-keys). A client or server always uses his own counter when sending a message to the other party. Because they both keep the two counters, the counter of the other party is also known. After each message sent to the other party own counter is incremented. After each message that is received from the other party, the other counter is incremented, so a counter increments after the processing of a message.
 
 #### Counter overflow
 If a counter reaches the maximum value _65535_ (because it is an u16), the connection must be closed because we don't want the risk of reusing encryption keys. The client needs to reconnect to the server.
@@ -177,7 +177,33 @@ If a counter reaches the maximum value _65535_ (because it is an u16), the conne
 
 _Figure F: Dynamic length bitmap_
 
-Plabble uses dynamically sized length integers (see _Figure F_). Plabble uses this system to avoid unnecessary bytes to be send, what makes Plabble faster and more efficient in its transport system. The length can have 1 to 4 bytes, and every last bit in every byte is used to indicate if the next byte is present. So if you have the first byte and the last bit equals 1, than a second byte is present. If on the second byte the last bit is set, a third byte is present etc. So the range of this integer is between 0 and 268435455.
+Plabble uses dynamically sized length unsigned integers (see _Figure F_). Plabble uses this system to avoid unnecessary bytes to be send, what makes Plabble faster and more efficient in its transport system. The length can have 1 to 4 bytes, and every last bit in every byte is used to indicate if the next byte is present. So if you have the first byte and the last bit equals 1, than a second byte is present. If on the second byte the last bit is set, a third byte is present etc. So the range of this integer is between 0 and 268435455.
+
+Below is a code snippet that indicates how the Plabble dynamic length integer could be implemented (Go):
+```go
+func encode(num int) (result []byte) {
+	result = make([]byte, 0, 4)
+	for num > 0 { // while loop
+        // in dynamic typed languages, remember to Floor the divisions!
+		encodedByte := byte(num % 128)
+		num /= 128
+		if num > 0 {
+			encodedByte |= 128
+		}
+		result = append(result, encodedByte)
+	}
+	return //result
+}
+
+func decode(arr []byte) (num int) {
+	multiplier := 1
+	for _, encodedByte := range arr {
+		num += (int(encodedByte) & 127) * multiplier
+		multiplier *= 128
+	}
+	return //num
+}
+```
 
 ### Endianness
 Everywhere throughout the protocol **little endian** encoding is used for consistency when encoding numbers. In the past, big endian was preferred because most devices at the time were big endian. Nowadays, it doesn't really matter so Plabble decided to use little endian because most devices nowadays are little endian.

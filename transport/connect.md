@@ -13,7 +13,7 @@ _Figure A: Connect request byte-map (body)_
 
 ---
 When you want to initiate a session you need no send a CONNECT request packet (see _Figure A_) to a server. The request packet contains the following data:
-- **Protocol version** (1 byte): The version of the **transport protocol** that is used.
+- **Protocol version** (1 byte, uint-8): The version of the **transport protocol** that is used.
 - **Public key** (32 bytes): Random X25519 key generated for this session.
 
 The connect packet has two [flags](./index.md#request-flags):
@@ -33,12 +33,17 @@ The response that is sent back by the server (see _Figure B_) contains the follo
 - Optionally the **certificate chain**, containing the server certificate and the other certificates in the chain in order [0: Server][1..n-1: CA][n: Root CA]. This part is only sent if the client set flag #7 in the request.
 
 The certificate contains the following fields:
-- **Length** (1 byte) the length of the following certificate in bytes. This includes all the fields
+- **Length** (1 byte, uint-8) the length of the following certificate in bytes. This includes all the fields
 - **Public key** (32 bytes) The Ed25519 signing key associated of the server which is the **identity key** of the server
 - **ValidFrom** (4 bytes): A [Plabble Timestamp]() that contains the moment from which the certificate is valid
 - **ValidTo** (4 bytes): A [Plabble Timestamp]() that contains the expiration date until the certificate is valid
 - **Signature** (64 bytes): The signature of the other fields in the certificate, signed with the key of the authority. The root certificate is self-signed, but a Plabble client does not accept other self-signed certificates by default
 - **Domain/IP** (variable): **UTF-8** encoded domain or IP address of the server the public key is associated with. Technical maximum of **151** bytes.
+
+Besides the data, the response is also indicated by a [status code](./index.md#response-codes). You can expect the following status codes:
+- 2 (unsupported protocol version): if protocol version is not supported by the server
+- 30 (upgraded to encrypted connection): if flag #6 is set and the server switched to encrypted communication
+- 31 (no certificate available): if flag #7 set and for some reason the server is unable to provide a valid certificate. Terminate connection if this happens.
 
 ## Process and data flow
 
@@ -53,7 +58,7 @@ The CONNECT process (see _Figure C_) works as follows:
 3. The server verifies the protocol version. If the protocol version is not supported, the server sends [error code](./index.md#response-codes) #2 _Unsupported protocol version_. 
 4. The server also generates a new, random `x25519` keypair.
 5. The server generates a _shared secret_ from its private x25519 key and the public x25519 key received from the client
-6. The server derives 64 bytes from the shared secret using the `HKDF-SHA256` function (salt: _nil_, info: _nil_). Store the first 32 bytes as the **session id** and the other 32 bytes as the **session key**. Store these keys for the session
+6. The server derives 64 bytes from the shared secret using the `HKDF-SHA256` function (salt: _nil_, info: _nil_). Store the first 32 bytes as the **session id** and the other 32 bytes as the **session key**. Store these keys for the session.
 7. The server signs the entire client request + the x25519 public key from step 4 with the **identity key** (the private key associated with the certificate of the server).
 8. The server sends the x25519 key, the signature and optionally the certificate chain in a CONNECT [response](#response) packet to the client.
 9. The client checks the certificate, if it was requested and provided. If requested but not provided or not valid, it aborts the connection
@@ -63,4 +68,4 @@ The CONNECT process (see _Figure C_) works as follows:
 13. The server and client are now connected
 
 ---
-> &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Next: [CREATE packet]() &rarr;
+> &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Next: [CREATE packet](./create.md) &rarr;
