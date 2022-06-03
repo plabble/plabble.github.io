@@ -16,7 +16,7 @@ A Plabble server stores the data in **buckets**. You can see a bucket as a key-v
 
 _Figure A: Plabble Request Packet_
 - *: The length is [dynamically sized](#dynamically-sized-length) and not always included
-- **: The type and flags use 4 bits each from 1 byte
+- **: The type and flags use 4 bits each from 1 byte. Notice these are the Most Significant Bits of this byte
 - ***: The [MAC](#authentication) is optional and is toggled with the flag on the 5th bit on the type/flag byte.
 
 ![Type-flag bitmap](/img/transport-typeflag-bitmap.png)
@@ -31,7 +31,7 @@ In _Figure A_ the byte map of the Plabble Request Packet is shown. The packets c
 - The **header**, which consists of the following fields:
     - **Type** and **Flag**, 4 bits each (first 4 bits indicate the [packet type](#packet-types) and the last 4 bits are the packet flags, see _Figure B_. The flags are different per packet type, except flag #5 which is reserved for the MAC. See [request flags](#request-flags).)
     - The dynamic **header fields** which depend on the packet type, see [packet types](#packet-types)
-- The **body**, which is a variable length field
+- The **body**, which is a variable length field that differs per [type](#packet-types).
 - Optionally a 16-byte **MAC**, see [Authentication](#authentication).
 
 ---
@@ -56,7 +56,7 @@ In _Figure C_ the byte map of the Plabble Response Packet is shown. The packets 
     - The 1-byte **status** field, which consists of a 7-bit [status code](#response-codes) and a 1-bit flag that toggles the MAC (see _Figure D_).
     - The unsigned 2-byte (16 bits) **message counter** is used to keep track on the sended and received messages and it is used to randomize the keys used for the encryption of the packet or MAC. The client and the server both keep two [counters](#counters) (client and server counter). The counter field in the response is the count of the packet it is a response to, so you can keep track on the messages you've sent to map requests and responses.
     - The dynamic **header fields** which depend on the packet type, see [packet types](#packet-types)
-- The **body**, which is a variable length field
+- The **body**, which is a variable length field that differs per [type](#packet-types).
 - Optionally a 16-byte **MAC**, see [Authentication](#authentication).
 
 ---
@@ -69,7 +69,7 @@ There are several types of packets specified in the protocol, with also a bunch 
 |---|---|--|
 | **[CONNECT](./connect.md)** | 0 | Start session on a  server
 | **[CREATE](./create.md)** | 1 | Create a new bucket
-| **[PUT]()** | 2 | Put a value to a bucket
+| **[PUT](./put.md)** | 2 | Put a value to a bucket
 | **[WIPE]()** | 3 | Wipe one or more values from the bucket
 | **[REQUEST]()** | 4 | Read one or more values from the bucket
 | **[SUBSCRIBE]()** | 5 | Subscribe to bucket updates
@@ -81,13 +81,13 @@ In a Plabble [Request Packet](#request-packet) there are 4 bits in the type/flag
 
 |[Packet type](#packet-types)|Flag #6|Flag #7|Flag #8|
 | --------- | ----- | ----- | ----- |
-| CONNECT   | Upgrade to encrypted connection | Send certificate in response | _reserved_
-| CREATE    | Subscribe to the created bucket with an optional range | Do not persist bucket (Create RAM bucket) | _reserved_
-| PUT       | Include the index on which the data should be placed | _reserved_ | _reserved_ |
-| WIPE      | _reserved_ | _reserved_ | _reserved_
-| REQUEST   | Also subscribe to the bucket or to the selected range | _reserved_ | _reserved_ |
-| SUBSCRIBE | _reserved_ | _reserved_ | _reserved_ |
-| UNSUBSCRIBE | _reserved_ | _reserved_ | _reserved_ |
+| **[CONNECT](./connect.md)**   | Upgrade to encrypted connection | Send certificate in response | _reserved_
+| **[CREATE](./create.md)**    | Subscribe to the created bucket with an optional range | Do not persist bucket (Create RAM bucket) | _reserved_
+| **[PUT](./put.md)**       | Include the index on which the data should be placed | _reserved_ | _reserved_ |
+| **[WIPE]()**      | _reserved_ | _reserved_ | _reserved_
+| **[REQUEST]()**   | Also subscribe to the bucket or to the selected range | _reserved_ | _reserved_ |
+| **[SUBSCRIBE]()** | _reserved_ | _reserved_ | _reserved_ |
+| **[UNSUBSCRIBE]()** | _reserved_ | _reserved_ | _reserved_ |
 
 ### Response codes
 In a Plabble [Response Packet](#response-packet) a status code is included. Some of these status codes are global, others are specific for a packet type. The status code is a 7-bit number and the following codes are in use:
@@ -100,7 +100,8 @@ In a Plabble [Response Packet](#response-packet) a status code is included. Some
 | 3 | Invalid permissions (permission denied) | _Global_ |
 | 4 | Authentication failed | _Global_ |
 | 5 | Payload too large | _Global_ |
-| 6 - 9 | _-- reserved --_ | _Global_ |
+| 6 | Bad request		| _Global_ |
+| 7 - 9 | _-- reserved --_ | _Global_ |
 | 10 | Subscription success | _Global_ |
 | 11 | Success, partial response (means more data on same request can follow) | _Global_ |
 | 12 | Bucket update (partial response content) | _Global_ |

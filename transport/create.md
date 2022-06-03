@@ -12,10 +12,10 @@ _Figure A: Create request byte-map (header and body)_
 
 ---
 The CREATE request (see Figure A) **includes a header**. This header contains one field: the **bucket id**. In this bucket id are also the permissions stored and the lifetime of the bucket in days. See [Bucket id](#bucket-id) for more info. The body contains two _optional_ fields:
-- **Slot range start** (2 bytes, optional): the (zero-based) index of the slot (uint-16) in the bucket to start subscribing to. For instance, you want to subscribe to slot 10 and up you provide "9" and leave _slot range end_ empty.
+- **Slot range start** (2 bytes, optional): the (zero-based) index of the slot (uint-16) in the bucket to start subscribing to. For instance, you want to subscribe from slot 10 and up you provide "9" and leave _slot range end_ empty.
 - **Slot range end** (2 bytes, optional): the (zero-based) index of the slot (uint-16) in the bucket to subscribe until. For instance, you want to subscribe from slot 5 until 10, you provide "4" to _slot range start_ and "9" to this field.
 
-It is possible to only provide the start slot (subscribe to slot _n_ and up), both slots (subscribe to range of slots) or none by leaving both fields out (subscribe to full bucket).
+It is possible to only provide the start slot (subscribe from slot _n_ and up), both slots (subscribe to range of slots) or none by leaving both fields out (subscribe to full bucket).
 
 The CREATE packet request has two [flags](./index.md#request-flags):
 - #6: Also subscribe to the bucket (with optional provided range)
@@ -92,4 +92,4 @@ The CREATE process (see _Figure D_) works as follows:
 
 
 ---
-> &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Prev: [CONNECT packet](./connect.md) - Next: [PUT packet]() &rarr;
+> &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Prev: [CONNECT packet](./connect.md) - Next: [PUT packet](./put.md) &rarr;

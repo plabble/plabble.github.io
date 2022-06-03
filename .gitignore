@@ -1,3 +1,4 @@
 _site/
 *.bkp
 Gemfile.lock
+_template.md
