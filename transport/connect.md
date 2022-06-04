@@ -58,7 +58,7 @@ The CONNECT process (see _Figure C_) works as follows:
 3. The server verifies the protocol version. If the protocol version is not supported, the server sends [error code](./index.md#response-codes) #2 _Unsupported protocol version_. 
 4. The server also generates a new, random `x25519` keypair.
 5. The server generates a _shared secret_ from its private x25519 key and the public x25519 key received from the client
-6. The server derives 64 bytes from the shared secret using the `HKDF-SHA256` function (salt: _nil_, info: _nil_). Store the first 32 bytes as the **session id** and the other 32 bytes as the **session key**. Store these keys for the session.
+6. The server stores the 32-byte shared secret for the session as **session key**.
 7. The server signs the entire client request + the x25519 public key from step 4 with the **identity key** (the private key associated with the certificate of the server).
 8. The server sends the x25519 key, the signature and optionally the certificate chain in a CONNECT [response](#response) packet to the client.
 9. The client checks the certificate, if it was requested and provided. If requested but not provided or not valid, it aborts the connection

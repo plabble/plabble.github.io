@@ -67,10 +67,10 @@ Bit | Permission
 Most commonly, the 6th is always set. Don't be so stupid to forget, because some server implementations might be very strict and also disallow reading although you own the bucket key if this flag is not set.
 
 ### Bucket key
-The 32-byte bucket key is not sent over the network, to increase safety and make the protocol more lightweight. However, both the client and the server have to know the key for authentication. So we generate a _shared secret_ using `HKDF-SHA256`, the **session id** (from the CONNECT process), the **bucket id** and the **client counter** (as uint-16 2 bytes) + the hardcoded byte `0x01`.
+The 32-byte bucket key is not sent over the network, to increase safety and make the protocol more lightweight. However, both the client and the server have to know the key for authentication. So we generate a _shared secret_ using `HKDF-SHA256`, the **session key** (from the CONNECT process), the **bucket id** and the **client counter** (as uint-16 2 bytes) + the hardcoded byte `0x01`.
 
 ```
-Bucket key = HKDF(key: session id, info: concat(bucket id, client counter, 0x01), salt: nil)
+Bucket key = HKDF(key: session key, info: concat(bucket id, client counter, 0x01), salt: nil)
 ```
 The bucket key is stored and used for [authentication](./index.md#authentication).
 

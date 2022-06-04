@@ -159,7 +159,7 @@ If _no encryption_ is used, the a 16-byte Message Authentication Code (MAC) is a
 When sending a [CONNECT](./connect.md) packet, encryption is not used and no MAC is included because the keys are not exchanged yet.
 
 ### MAC and Encryption keys
-The keys used to encrypt the packet are generated using a Key Derivation Function (KDF). We use `HKDF-SHA256` to derive keys from a shared secret generated in the [CONNECT](./connect.md) step, referred as the _session id_ and _session key_. For generating encryption or authorization keys we use the _session key_. We generate 2 keys every request:
+The keys used to encrypt the packet are generated using a Key Derivation Function (KDF). We use `HKDF-SHA256` to derive keys from a shared secret generated in the [CONNECT](./connect.md) step, referred to as the _session key_. For generating encryption or authorization keys we use this _session key_. We generate 2 keys every request:
 - Key 0: HKDF( _key_: session key, _info_: [counter](#counters) (2 bytes, [LE](#endianness)) + `0x00` )
 - Key 1: HKDF( _key_: session key, _info_: [counter](#counters) (2 bytes, [LE](#endianness)) + `0x01` )
 
