@@ -70,7 +70,7 @@ There are several types of packets specified in the protocol, with also a bunch 
 | **[CONNECT](./connect.md)** | 0 | Start session on a  server
 | **[CREATE](./create.md)** | 1 | Create a new bucket
 | **[PUT](./put.md)** | 2 | Put a value to a bucket
-| **[WIPE]()** | 3 | Wipe one or more values from the bucket
+| **[DELETE]()** | 3 | Delete one or more values from the bucket, or entire bucket
 | **[REQUEST]()** | 4 | Read one or more values from the bucket
 | **[SUBSCRIBE]()** | 5 | Subscribe to bucket updates
 | **[UNSUBSCRIBE]()** | 6 | Unsubscribe from bucket updates
@@ -84,7 +84,7 @@ In a Plabble [Request Packet](#request-packet) there are 4 bits in the type/flag
 | **[CONNECT](./connect.md)**   | Upgrade to encrypted connection | Send certificate in response | _reserved_
 | **[CREATE](./create.md)**    | Subscribe to the created bucket with an optional range | Do not persist bucket (Create RAM bucket) | _reserved_
 | **[PUT](./put.md)**       | Include the index on which the data should be placed | _reserved_ | _reserved_ |
-| **[WIPE]()**      | _reserved_ | _reserved_ | _reserved_
+| **[DELETE]()**      | Delete entire bucket | _reserved_ | _reserved_
 | **[REQUEST]()**   | Also subscribe to the bucket or to the selected range | _reserved_ | _reserved_ |
 | **[SUBSCRIBE]()** | _reserved_ | _reserved_ | _reserved_ |
 | **[UNSUBSCRIBE]()** | _reserved_ | _reserved_ | _reserved_ |
@@ -123,7 +123,7 @@ In a Plabble [Response Packet](#response-packet) a status code is included. Some
 | 53 | Selected index out of order (only if no write permissions and try to append with index) | put |
 | 54 - 59 | _-- reserved for PUT --_ | put |
 | |
-| 60 - 69 | _-- reserved for WIPE --_ | wipe |
+| 60 - 69 | _-- reserved for DELETE --_ | delete |
 | |
 | 70 | Subscription success and partial (server might send 10 or 11 instead of this one) | request |
 | 71 - 79 | _-- reserved for REQUEST--_ | request |
