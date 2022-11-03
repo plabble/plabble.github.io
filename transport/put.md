@@ -56,4 +56,4 @@ The PUT process (see _Figure C_) goes as follows:
 
 
 ---
-> &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Prev: [CREATE packet](./create.md) - Next: [DELETE packet]() &rarr;
+> &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Prev: [CREATE packet](./create.md) - Next: [WIPE packet](./wipe.md) &rarr;

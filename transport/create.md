@@ -60,11 +60,11 @@ Bit | Permission
 3th | Allow _public_ **read**
 4th | Allow _public_ **write** (update message at index)
 5th | Allow _public_ **append** (add message to bucket)
-6th | Allow _private_ **read**
-7th | Allow _private_ **write**
-8th | Allow _private_ **append**
+6th | Allow _private_ **write**
+7th | Allow _private_ **append**
+8th | Allow the bucket to be deleted
 
-Most commonly, the 6th is always set. Don't be so stupid to forget, because some server implementations might be very strict and also disallow reading although you own the bucket key if this flag is not set.
+Private read is always allowed. The 8th bit is set if you want to allow the bucket to be deleted. If this flag is _not_ set, the bucket can only be _wiped_ but not be _deleted_ from the server.
 
 ### Bucket key
 The 32-byte bucket key is not sent over the network, to increase safety and make the protocol more lightweight. However, both the client and the server have to know the key for authentication. So we generate a _shared secret_ using `HKDF-SHA256`, the **session key** (from the CONNECT process), the **bucket id** and the **client counter** (as uint-16 2 bytes) + the hardcoded byte `0x01`.
