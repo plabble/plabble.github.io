@@ -66,4 +66,4 @@ The REQUEST process (see _Figure C_) goes as follows:
 Note: If the user has subscribed and an update is pushed to the bucket, the server will send another response to the REQUEST request if this request asked to subscribe. This packet contains status code 12 and the response looks the same as a REQUEST response.
 
 ---
-> &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Prev: [WIPE packet](./wipe.md) - Next: [SUBSCRIBE packet]() &rarr;
+> &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Prev: [WIPE packet](./wipe.md) - Next: [SUBSCRIBE packet](./subscribe.md) &rarr;

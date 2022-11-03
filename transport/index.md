@@ -72,8 +72,8 @@ There are several types of packets specified in the protocol, with also a bunch 
 | **[PUT](./put.md)** | 2 | Put a value to a bucket
 | **[WIPE](./wipe.md)** | 3 | Wipe one or more values from the bucket, or delete entire bucket
 | **[REQUEST](./request.md)** | 4 | Read one or more values from the bucket
-| **[SUBSCRIBE]()** | 5 | Subscribe to bucket updates
-| **[UNSUBSCRIBE]()** | 6 | Unsubscribe from bucket updates
+| **[SUBSCRIBE](./subscribe.md)** | 5 | Subscribe to bucket updates
+| **[UNSUBSCRIBE](./unsubscribe.md)** | 6 | Unsubscribe from bucket updates
 | _reserved_ | 7 - 15 | Reserved types for future use
 
 ### Request flags
@@ -86,8 +86,8 @@ In a Plabble [Request Packet](#request-packet) there are 4 bits in the type/flag
 | **[PUT](./put.md)**       | Include the index on which the data should be placed | _reserved_ | _reserved_ |
 | **[WIPE](./wipe.md)**      | Delete entire bucket | _reserved_ | _reserved_
 | **[REQUEST](./request.md)**   | Also subscribe to the bucket or to the selected range | _reserved_ | _reserved_ |
-| **[SUBSCRIBE]()** | _reserved_ | _reserved_ | _reserved_ |
-| **[UNSUBSCRIBE]()** | _reserved_ | _reserved_ | _reserved_ |
+| **[SUBSCRIBE](./subscribe.md)** | _reserved_ | _reserved_ | _reserved_ |
+| **[UNSUBSCRIBE](./unsubscribe.md)** | _reserved_ | _reserved_ | _reserved_ |
 
 ### Response codes
 In a Plabble [Response Packet](#response-packet) a status code is included. Some of these status codes are global, others are specific for a packet type. The status code is a 7-bit number and the following codes are in use:
