@@ -70,7 +70,7 @@ There are several types of packets specified in the protocol, with also a bunch 
 | **[CONNECT](./connect.md)** | 0 | Start session on a  server
 | **[CREATE](./create.md)** | 1 | Create a new bucket
 | **[PUT](./put.md)** | 2 | Put a value to a bucket
-| **[APPEND](./append.md) | 3 | Append a value to the first free slot in the bucket
+| **[APPEND](./append.md)** | 3 | Append a value to the first free slot in the bucket
 | **[WIPE](./wipe.md)** | 4 | Wipe one or more values from the bucket, or delete entire bucket
 | **[REQUEST](./request.md)** | 5 | Read one or more values from the bucket
 | **[SUBSCRIBE](./subscribe.md)** | 6 | Subscribe to bucket updates
@@ -85,7 +85,7 @@ In a Plabble [Request Packet](#request-packet) there are 4 bits in the type/flag
 | **[CONNECT](./connect.md)**   | Upgrade to encrypted connection | Send certificate in response | _reserved_
 | **[CREATE](./create.md)**    | Subscribe to the created bucket with an optional range | Do not persist bucket (Create RAM bucket) | _reserved_
 | **[PUT](./put.md)**       | _reserved_ | _reserved_ | _reserved_ |
-| **[APPEND](./append.md) | _reserved_ | _reserved_ | _reserved |
+| **[APPEND](./append.md)** | _reserved_ | _reserved_ | _reserved |
 | **[WIPE](./wipe.md)**      | Delete entire bucket | _reserved_ | _reserved_
 | **[REQUEST](./request.md)**   | Also subscribe to the bucket or to the selected range | _reserved_ | _reserved_ |
 | **[SUBSCRIBE](./subscribe.md)** | _reserved_ | _reserved_ | _reserved_ |
