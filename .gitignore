@@ -3,3 +3,4 @@ _site/
 *.dtmp
 Gemfile.lock
 _template.md
+todo.md

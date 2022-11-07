@@ -42,7 +42,7 @@ You may expect the following [status codes](./index.md#response-codes):
 - 11 (success, partial data): Request successfull, but too long, partial data is sent and more data can follow
 - 12 (bucket update): This one is sent **after** the response when you have subscribed and the bucket is updated. This one contains the update data, which is the same as the REQUEST response (Figure B)
 - 21 (bucket does not exist): The requested bucket is not found
-- 70 (subscription success, partial response): The subscription is success but this response was too long, so partial data
+- 80 (subscription success, partial response): The subscription is success but this response was too long, so partial data
 
 Note that status code 12 can follow in another response if the subscribe flag is set.
 
@@ -60,7 +60,7 @@ The REQUEST process (see _Figure C_) goes as follows:
 3. If the subscribe flag is set, subscribe user to bucket (optionally with range), see [SUBSCRIBE]().
 4. If the flag is not set but a range is provided, select the slots from the database within the range.
 5. If the range is not provided, get all slots from the database
-6. Create a response. If the response is too large, split it up and send it with code 11 (or 70, if subscribed in step 3)
+6. Create a response. If the response is too large, split it up and send it with code 11 (or 80, if subscribed in step 3)
 7. If the response fits inside one packet, send it to the client with code 0 (or 10, if subscribed in step 3).
 
 Note: If the user has subscribed and an update is pushed to the bucket, the server will send another response to the REQUEST request if this request asked to subscribe. This packet contains status code 12 and the response looks the same as a REQUEST response.

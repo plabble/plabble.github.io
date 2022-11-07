@@ -70,11 +70,12 @@ There are several types of packets specified in the protocol, with also a bunch 
 | **[CONNECT](./connect.md)** | 0 | Start session on a  server
 | **[CREATE](./create.md)** | 1 | Create a new bucket
 | **[PUT](./put.md)** | 2 | Put a value to a bucket
-| **[WIPE](./wipe.md)** | 3 | Wipe one or more values from the bucket, or delete entire bucket
-| **[REQUEST](./request.md)** | 4 | Read one or more values from the bucket
-| **[SUBSCRIBE](./subscribe.md)** | 5 | Subscribe to bucket updates
-| **[UNSUBSCRIBE](./unsubscribe.md)** | 6 | Unsubscribe from bucket updates
-| _reserved_ | 7 - 15 | Reserved types for future use
+| **[APPEND](./append.md) | 3 | Append a value to the first free slot in the bucket
+| **[WIPE](./wipe.md)** | 4 | Wipe one or more values from the bucket, or delete entire bucket
+| **[REQUEST](./request.md)** | 5 | Read one or more values from the bucket
+| **[SUBSCRIBE](./subscribe.md)** | 6 | Subscribe to bucket updates
+| **[UNSUBSCRIBE](./unsubscribe.md)** | 7 | Unsubscribe from bucket updates
+| _reserved_ | 8 - 15 | Reserved types for future use
 
 ### Request flags
 In a Plabble [Request Packet](#request-packet) there are 4 bits in the type/flags field that are used to set some properties on a packet. **The first bit (flag #5) is global** and is the same for every packet type: when this flag is set, a MAC is included in the request. The other flags differ per type:
@@ -83,7 +84,8 @@ In a Plabble [Request Packet](#request-packet) there are 4 bits in the type/flag
 | --------- | ----- | ----- | ----- |
 | **[CONNECT](./connect.md)**   | Upgrade to encrypted connection | Send certificate in response | _reserved_
 | **[CREATE](./create.md)**    | Subscribe to the created bucket with an optional range | Do not persist bucket (Create RAM bucket) | _reserved_
-| **[PUT](./put.md)**       | Include the index on which the data should be placed | _reserved_ | _reserved_ |
+| **[PUT](./put.md)**       | _reserved_ | _reserved_ | _reserved_ |
+| **[APPEND](./append.md) | _reserved_ | _reserved_ | _reserved |
 | **[WIPE](./wipe.md)**      | Delete entire bucket | _reserved_ | _reserved_
 | **[REQUEST](./request.md)**   | Also subscribe to the bucket or to the selected range | _reserved_ | _reserved_ |
 | **[SUBSCRIBE](./subscribe.md)** | _reserved_ | _reserved_ | _reserved_ |
@@ -118,23 +120,25 @@ In a Plabble [Response Packet](#response-packet) a status code is included. Some
 | 42 - 49 | _-- reserved for CREATE --_ | create |
 | |
 | 50 | _-- reserved for PUT --_ | put |
-| 51 | Bucket is full | put |
-| 52 | Selected index in bucket already taken (only if no write permissions and try to append with index) | put |
-| 53 | Selected index out of order (only if no write permissions and try to append with index) | put |
-| 54 - 59 | _-- reserved for PUT --_ | put |
+| 51 | Selected index in bucket already taken (only if no write permissions and try to append with index) | put |
+| 52 - 59 | _-- reserved for PUT --_ | put |
 | |
-| 60 | _-- reserved for WIPE --_ | 
-| 61 | It is not allowed to delete this bucket |
-| 62 - 69 | _-- reserved for WIPE --_ | wipe |
+| 60 | _-- reserved for APPEND --_ | append |
+| 61 | Bucket full | append |
+| 62 - 69 | _-- reserved for APPEND --_ | append |
 | |
-| 70 | Subscription success and partial (server might send 10 or 11 instead of this one) | request |
-| 71 - 79 | _-- reserved for REQUEST--_ | request |
+| 70 | _-- reserved for WIPE --_ | 
+| 71 | It is not allowed to delete this bucket |
+| 72 - 79 | _-- reserved for WIPE --_ | wipe |
 | |
-| 80 - 89 | _-- reserved for SUBSCRIBE --_ | subscribe |
+| 80 | Subscription success and partial (server might send 10 or 11 instead of this one) | request |
+| 81 - 89 | _-- reserved for REQUEST--_ | request |
 | |
-| 90 - 99 | _-- reserved for UNSUBSCRIBE --_ | unsubscribe |
+| 90 - 99 | _-- reserved for SUBSCRIBE --_ | subscribe |
 | |
-| 100 - 119 | _-- reserved for other types --_ | other |
+| 100 - 109 | _-- reserved for UNSUBSCRIBE --_ | unsubscribe |
+| |
+| 110 - 119 | _-- reserved for other types --_ | other |
 | 120 - 127 | _-- reserved --_ | _Global_ |
 
 ## Packet encryption and authentication

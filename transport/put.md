@@ -13,14 +13,14 @@ _Figure A: PUT request byte-map (header and body)_
 ---
 The PUT request (see Figure A) **includes a header**. This header contains one field: the [bucket id](./create.md#bucket-id) and is used to indicate which bucket is used.
 
-The PUT packet accepts one [flag](./index.md#request-flags):
-- #6: Include slot index
+The PUT packet accepts no extra flags.
 
-The body can contain the following fields:
-- **Slot index** (optional): a 2-byte integer (uint-16) that indicates the index of the slot in the bucket that must be replaced. Leave out to append to next empty slot.
+The body contains an array with the following fields:
+- **Slot index**: a 2-byte integer (uint-16) that indicates the index of the slot in the bucket that must be replaced. If you want to use the first empty slot, try an [APPEND](./append.md) request instead.
+- **Length**: a [dynamically sized](./index.md#dynamically-sized-length) integer that indicates the length of the following content.
 - **Content**: variable-length byte content. Can be literally everything, but is limited to ~268 MB due to the [dynamic length](./index.md#dynamically-sized-length) property of the request packet which is currently limited to 4 bytes from which 28 bits can be used.
 
-The slot index is set when you want to put the data in a specific slot. This will replace the data in the slot if it is already in use and you have _write_ permissions. If you have _append_ permissions and you try to write data to a slot that is not empty or is not the next empty slot in the bucket the server will send [error code](./index.md#response-codes) 3.
+The indicated slot index will replace the data in the slot if it is already in use and you have _write_ permissions. If you have _append_ permissions and you try to write data to a slot that is not empty or is not the next empty slot in the bucket the server will send [error code](./index.md#response-codes) 51.
 
 ## Response
 
@@ -37,7 +37,7 @@ You can expect the following status codes:
 - 4 (authentication failed): the bucket key you are providing might not be valid
 - 5 (payload too large): you try to put more data to a slot than the server supports. Try splitting your data on multiple slots
 - 21 (bucket does not exist): The bucket you are trying to PUT to does not exist
-- 51 (bucket full): The bucket you are trying to append data to is full (reached slot 65,535)
+- 51 (selected index taken): Selected index in bucket is already taken (only thrown if no _write_ permissions, else the index is overwritten)
 
 ## Process and flow
 
@@ -50,10 +50,9 @@ The PUT process (see _Figure C_) goes as follows:
 
 1. The client sends a PUT message containing the data and optionally containing a slot index
 2. The server checks if the user has permission to modify the bucket. If not, error code 3 is sent
-3. If the user has write permissions and specified an index, put data to that slot (overwrite if slot is already in use)
-4. If the user has append permissions and specified an index, only put data to that slot if slot is not already filled and is the first following empty slot in the bucket. Otherwise, return error 3
-5. If the user did not specify an index, add the data to the first following empty slot in the bucket. If no empty slots are left, send error 51
+3. If the user has write permissions, put data to that slot (overwrite if slot is already in use)
+4. If the user has append permissions, only put data to that slot if slot is not already filled and is the first following empty slot in the bucket. If not the first following empty slot, return error 3. If the slot is already taken, return error 51.
 
 
 ---
-> &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Prev: [CREATE packet](./create.md) - Next: [WIPE packet](./wipe.md) &rarr;
+> &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Prev: [CREATE packet](./create.md) - Next: [APPEND packet](./append.md) &rarr;
