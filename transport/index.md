@@ -127,8 +127,8 @@ In a Plabble [Response Packet](#response-packet) a status code is included. Some
 | 61 | Bucket full | append |
 | 62 - 69 | _-- reserved for APPEND --_ | append |
 | |
-| 70 | _-- reserved for WIPE --_ | 
-| 71 | It is not allowed to delete this bucket |
+| 70 | _-- reserved for WIPE --_ | wipe |
+| 71 | It is not allowed to delete this bucket | wipe |
 | 72 - 79 | _-- reserved for WIPE --_ | wipe |
 | |
 | 80 | Subscription success and partial (server might send 10 or 11 instead of this one) | request |
