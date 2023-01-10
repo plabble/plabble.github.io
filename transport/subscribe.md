@@ -28,13 +28,11 @@ If both indexes are omitted, the user will be subscribed to all slots/to the ent
 _Figure B: SUBSCRIBE response byte-map_
 
 ---
-The SUBSCRIBE request does not return any data directly. However, when an update occurs, a [REQUEST](./request.md#response) response is sent to the user with status code **12**.
+The SUBSCRIBE request does not return any data directly. However, when an update occurs, a [REQUEST](./request.md#response) response is sent to the user.
 
-You may expect the following [status codes](./index.md#response-codes):
+You might encounter the following [error codes](./error.md#error-codes):
 - 3 (invalid permissions): This bucket does not have the correct permissions to be read (so we can't subscribe either)
-- 4 (authentication failed): Authentication for this bucket failed (bucket key missing or invalid)
-- 10 (subscription success): Subscription succeed
-- 12 (bucket update): This one is sent **after** the response when the bucket is updated. This one contains the update data, which is the same as the REQUEST response.
+- 4 (authentication failed): Authentication for this bucket failed (bucket key missing or invalid).
 - 21 (bucket does not exist): The requested bucket is not found
 
 ## Process and flow
@@ -50,8 +48,7 @@ The SUBSCRIBE process (see _Figure C_) goes as follows:
 2. The server checks if the user has read permissions. If not, error code 3 is sent.
 3. If a range is provided, the user is subscribed to only that slot range
 4. If no range is provided, the user is subscribed to the entire bucket (all slots)
-5. Status code 10 is sent to indicate that the subscription succeeded.
-6. When an update is pushed to the bucket (a slot is added or modified, or wiped) a [REQUEST](./request.md#response) is sent with status code 12 and the update data. This response is sent after the response of step 5 and can be partial.
+5. When an update is pushed to the bucket (a slot is added or modified, or wiped) a [REQUEST](./request.md#response) is sent with the update data. This response is sent after the response of step 5.
 
 ---
 > &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Prev: [REQUEST packet](./request.md) - Next: [UNSUBSCRIBE packet](./unsubscribe.md) &rarr;

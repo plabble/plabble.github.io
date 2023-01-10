@@ -31,8 +31,7 @@ _Figure B: WIPE response byte-map_
 ---
 The WIPE response is empty, and the result is indicated by a [status code](./index.md#response-codes).
 
-You can expect the following status codes:
-- 0 (success): indexes or entire bucket successfully wiped
+You might encounter the following [error codes](./error.md#error-codes):
 - 3 (invalid permissions): you are not allowed to wipe this bucket (no write permissions)
 - 4 (authentication failed): the bucket key you are providing might not be valid
 - 21 (bucket does not exist): requested bucket not found

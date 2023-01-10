@@ -32,12 +32,10 @@ The second flag could be set if you don't want the server to store your bucket o
 _Figure B: Create response byte-map_
 
 ---
-To keep it easy for you, the create response is empty, and the result is indicated by a [status code](./index.md#response-codes).
+To keep it easy for you, the create response is empty.
 
-You can expect the following status codes:
-- 0 (success): bucket created
+You might encounter the following [error codes](./error.md#error-codes):
 - 4 (authentication failed): if no [authentication](./index.md#authentication) data provided
-- 10 (subscription success): bucket created and subscribed
 - 41 (bucket already exists): if ID is already in use
 
 ## Bucket id and key
@@ -67,10 +65,10 @@ Bit | Permission
 Private read is always allowed. The 8th bit is set if you want to allow the bucket to be deleted. If this flag is _not_ set, the bucket can only be _wiped_ but not be _deleted_ from the server.
 
 ### Bucket key
-The 32-byte bucket key is not sent over the network, to increase safety and make the protocol more lightweight. However, both the client and the server have to know the key for authentication. So we generate a _shared secret_ using `HKDF-SHA256`, the **session key** (from the CONNECT process), the **bucket id** and the **client counter** (as uint-16 2 bytes) + the hardcoded byte `0x01`.
+The 32-byte bucket key is not sent over the network, to increase safety and make the protocol more lightweight. However, both the client and the server have to know the key for authentication. So we generate a _shared secret_ using `HKDF-SHA256`, the **session key** (from the CONNECT process), the **bucket id** and the **client counter** (as uint-16 2 bytes).
 
 ```
-Bucket key = HKDF(key: session key, info: concat(bucket id, client counter, 0x01), salt: nil)
+Bucket key = HKDF(key: session key, info: concat(bucket id, client counter), salt: nil)
 ```
 The bucket key is stored and used for [authentication](./index.md#authentication).
 
@@ -88,7 +86,7 @@ The CREATE process (see _Figure D_) works as follows:
 3. The server checks and verifies if the ID is not taken and the authentication is correct. If so, the server creates the bucket
 4. If the bucket id is already taken the server sends [error code](./index.md#response-codes) #41. 
 5. The server subscribes the user to the bucket if flag #6 is set and optionally to a specific range
-6. The server sends the empty CREATE response with status code 0 or 10.
+6. The server sends the empty CREATE response.
 
 
 ---

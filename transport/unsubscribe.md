@@ -24,8 +24,7 @@ _Figure B: UNSUBSCRIBE response byte-map_
 ---
 The UNSUBSCRIBE request does not return any data.
 
-You may expect the following [status codes](./index.md#response-codes):
-- 0 (success): Unsubscribed successfully
+You may encounter the following [error codes](./error.md#error-codes):
 - 4 (authentication failed): Authentication for this bucket failed (bucket key missing or invalid)
 - 21 (bucket does not exist): The requested bucket is not found
 
@@ -40,7 +39,7 @@ The UNSUBSCRIBE process (see _Figure C_) goes as follows:
 
 1. The client sends a UNSUBSCRIBE packet to the server
 2. The server checks if the user is subscribed. If so, it removes the subscription.
-3. The server sends status code 0.
+3. The server sends an empty response.
 
 ---
 > &larr; Back to [Home](../index.md) - To [Transport](./index.md) - Prev: [SUBSCRIBE packet](./subscribe.md) &rarr;

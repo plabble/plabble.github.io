@@ -29,10 +29,9 @@ The indicated slot index will replace the data in the slot if it is already in u
 _Figure B: PUT response byte-map_
 
 ---
-The PUT response is empty, and the result is indicated by a [status code](./index.md#response-codes).
+The PUT response is empty.
 
-You can expect the following status codes:
-- 0 (success): data saved to bucket
+You might encounter the following [error codes](./error.md#error-codes):
 - 3 (invalid permissions): you try to put data on a non-empty slot without _write_ permissions or you have no _write_ or _append_ permissions at all. This can also mean you are missing the bucket key.
 - 4 (authentication failed): the bucket key you are providing might not be valid
 - 5 (payload too large): you try to put more data to a slot than the server supports. Try splitting your data on multiple slots
