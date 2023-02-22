@@ -35,12 +35,12 @@ The response that is sent back by the server (see _Figure B_) contains the follo
 The certificate contains the following fields:
 - **Length** (1 byte, uint-8) the length of the following certificate in bytes. This includes all the fields
 - **Public key** (32 bytes) The `Ed25519` signing key associated of the server which is the **identity key** of the server
-- **ValidFrom** (4 bytes): A [Plabble Timestamp]() that contains the moment from which the certificate is valid
-- **ValidTo** (4 bytes): A [Plabble Timestamp]() that contains the expiration date until the certificate is valid
+- **ValidFrom** (4 bytes): A [Plabble Timestamp](./index.md#plabble-timestamp) that contains the moment from which the certificate is valid
+- **ValidTo** (4 bytes): A [Plabble Timestamp](./index.md#plabble-timestamp) that contains the expiration date until the certificate is valid
 - **Signature** (64 bytes): The signature of the other fields in the certificate, signed with the key of the authority. The root certificate is self-signed, but a Plabble client does not accept other self-signed certificates by default
 - **Domain/IP** (variable): **UTF-8** encoded domain or IP address of the server the public key is associated with. Technical maximum of **151** bytes.
 
-Besides the data, the response is also indicated by a [status code](./index.md#response-codes). You might encounter the following [error codes](./error.md#error-codes):
+You might encounter the following [error codes](./error.md#error-codes):
 - 2 (unsupported protocol version): if protocol version is not supported by the server
 - 31 (no certificate available): if flag #7 set and for some reason the server is unable to provide a valid certificate. Terminate connection if this happens.
 - 32 (could not upgrade to encrypted connection): failed or refused to upgrade to encrypted connection
@@ -55,15 +55,15 @@ _Figure C: Connect process flow_
 The CONNECT process (see _Figure C_) works as follows:
 1. The client generates a new, random `X25519` keypair and stores this for the session.
 2. The client sends the protocol version and the public key to the server in a CONNECT [request](#request) packet. If the client wants to upgrade to an encrypted connection or to receive the signature, it sets the flags in the packet
-3. The server verifies the protocol version. If the protocol version is not supported, the server sends [error code](./index.md#response-codes) #2 _Unsupported protocol version_. 
+3. The server verifies the protocol version. If the protocol version is not supported, the server sends [error code](./error.md#error-codes) #2 _Unsupported protocol version_. 
 4. The server also generates a new, random `X25519` keypair.
-5. The server generates a _shared secret_ from its private x25519 key and the public x25519 key received from the client
+5. The server generates a _shared secret_ from its private X25519 key and the public X25519 key received from the client
 6. The server stores the 32-byte shared secret for the session as **session key**.
-7. The server signs the entire client request + the x25519 public key from step 4 with the **identity key** (the private key associated with the certificate of the server).
-8. The server sends the x25519 key, the signature and optionally the certificate chain in a CONNECT [response](#response) packet to the client.
+7. The server signs the entire client request + the X25519 public key from step 4 with the **identity key** (the private key associated with the certificate of the server).
+8. The server sends the X25519 key, the signature and optionally the certificate chain in a CONNECT [response](#response) packet to the client.
 9. The client checks the certificate, if it was requested and provided. If requested but not provided or not valid, it aborts the connection
 10. The clients checks the signature the server had sent. It aborts the connection if the signature is not valid
-11. The client generates a shared secret from own public x25519 key and the x25519 key received from the server
+11. The client generates a shared secret from own public X25519 key and the X25519 key received from the server
 12. The client performs step 6 and stores the result
 13. The server and client are now connected
 

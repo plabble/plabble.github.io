@@ -76,7 +76,7 @@ There are several types of packets specified in the protocol, with also a bunch 
 | **[SUBSCRIBE](./subscribe.md)** | 6 | Subscribe to bucket updates
 | **[UNSUBSCRIBE](./unsubscribe.md)** | 7 | Unsubscribe from bucket updates
 | _reserved_ | 8 - 14 | Reserved types for future use
-| **[ERROR]()** | 15 | Error type, _response only_ |
+| **[ERROR](./error.md)** | 15 | Error type, _response only_ |
 
 ### Request flags
 In a Plabble [Request Packet](#request-packet) there are 4 bits in the type/flags field that are used to set some properties on a packet. **The first bit (flag #5) is global** and is the same for every packet type: when this flag is set, a MAC is included in the request. The other flags differ per type:
@@ -110,7 +110,7 @@ The data hashed in the **MAC** (Message Authentication Code) or **AD** (Associat
 
 - **Header values**: The packet header: type/flag and header fields for a request and the status, counter and header fields for the response. Size can differ
 - Optionally a **body hash**, a `SHA-256` hash of the body (32 bytes). This body hash is only included when **no encryption is used** to ensure integrity on the body data
-- Optionally a **bucket key** to prove that you are allowed to perform specific operations on a bucket.
+- Optionally a **bucket key** to prove that you are allowed to perform specific operations on a bucket. So the bucket key is never provided in a server response.
 
 If a packet _is encrypted_, the **header** is encrypted with the `ChaCha20` algorithm while the body is encrypted with `ChaCha20-Poly1305` AEAD algorithm like shown in [_Figure A_](#request-packet) and [_Figure C_](#response-packet). The authentication data poly hash is thus passed to the body while the header does not contain authentication data. Because the header data is included in the body authentication hash it can still be verified safely. No MAC is included.
 
@@ -123,7 +123,7 @@ The keys used to encrypt the packet are generated using a Key Derivation Functio
 - Key 0: HKDF( _key_: session key, _info_: [counter](#counters) (2 bytes, [BE](#endianness)) + `0x00` )
 - Key 1: HKDF( _key_: session key, _info_: [counter](#counters) (2 bytes, [BE](#endianness)) + `0x01` )
 
-These two keys are generated because it is not secure to reuse keys with the same nonce when using `chacha20` (we use an empty byte array of 12 bytes as nonce at this point). When encrypting the packet we use _Key 0_ to encrypt the header and _Key 1_ to encrypt the body. If no encryption is used, _Key 0_ is used to generate the MAC. Because the counter differs every time, different encryption keys are used for every packet.
+These two keys are generated because it is not secure to reuse keys with the same nonce when using `ChaCha20` (we use an empty byte array of 12 bytes as nonce at this point). When encrypting the packet we use _Key 0_ to encrypt the header and _Key 1_ to encrypt the body. If no encryption is used, _Key 0_ is used to generate the MAC. Because the counter differs every time, different encryption keys are used for every packet.
 
 ### Counters
 The client and the server both keep two counters which are stored in a 2-byte unsigned integer (uint-16) each, a **client counter** and a **server counter**. These counters are used as a _nonce_ in the Key Derivation Function (KDF) to generate a shared secret that differs every time and to keep track on requests/responses. To encrypt the data or create a MAC the counters are used to [generate a key](#mac-and-encryption-keys). A client or server always uses his own counter when sending a message to the other party. Because they both keep the two counters, the counter of the other party is also known. After each message sent to the other party own counter is incremented. After each message that is received from the other party, the other counter is incremented, so a counter increments after the processing of a message.
@@ -168,6 +168,9 @@ func decode(arr []byte) (num int) {
 
 ### Endianness
 Everywhere throughout the protocol **big endian** encoding is used for consistency when encoding numbers. The big endian encoding is easier to understand and performance-wise it doesn't matter on the computers today.
+
+### Plabble Timestamp
+Besides the dynamic integer, PTP also uses a special encoding for encoding timestamps. They are stored in seconds since the Epoch moment, `2020/01/01, 00:00:00 UTC`. 
 
 ---
 > &larr; Back to [Home](../index.md) - Next: [CONNECT packet](./connect.md) &rarr;

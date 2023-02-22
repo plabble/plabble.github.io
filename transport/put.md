@@ -20,7 +20,7 @@ The body contains an array with the following fields:
 - **Length**: a [dynamically sized](./index.md#dynamically-sized-length) integer that indicates the length of the following content.
 - **Content**: variable-length byte content. Can be literally everything, but is limited to ~268 MB due to the [dynamic length](./index.md#dynamically-sized-length) property of the request packet which is currently limited to 4 bytes from which 28 bits can be used.
 
-The indicated slot index will replace the data in the slot if it is already in use and you have _write_ permissions. If you have _append_ permissions and you try to write data to a slot that is not empty or is not the next empty slot in the bucket the server will send [error code](./index.md#response-codes) 51.
+The indicated slot index will replace the data in the slot if it is already in use and you have _write_ permissions. If you have _append_ permissions and you try to write data to a slot that is not empty or is not the next empty slot in the bucket the server will send [error code](./error.md#error-codes) 51.
 
 ## Response
 

@@ -26,7 +26,7 @@ The body contains an array with the following fields:
 _Figure B: APPEND response byte-map_
 
 ---
-The APPEND response is empty, and the result is indicated by a [status code](./index.md#response-codes).
+The APPEND response is empty.
 
 You might encounter the following [error codes](./error.md#error-codes):
 - 3 (invalid permissions): you try to put data on a non-empty slot without _write_ permissions or you have no _write_ or _append_ permissions at all. This can also mean you are missing the bucket key.

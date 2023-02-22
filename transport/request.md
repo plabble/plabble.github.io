@@ -50,7 +50,7 @@ The REQUEST process (see _Figure C_) goes as follows:
 
 1. The client sends a REQUEST packet to the server
 2. If the bucket exists but the user does not have write permission, return error code 3.
-3. If the subscribe flag is set, subscribe user to bucket (optionally with range), see [SUBSCRIBE]().
+3. If the subscribe flag is set, subscribe user to bucket (optionally with range), see [SUBSCRIBE](./subscribe.md).
 4. If the flag is not set but a range is provided, select the slots from the database within the range.
 5. If the range is not provided, get all slots from the database
 6. Create the response and send it to the user.

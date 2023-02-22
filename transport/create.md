@@ -84,7 +84,7 @@ The CREATE process (see _Figure D_) works as follows:
 1. The user generates the [bucket id](#bucket-id) and sets the lifetime and the permission flags
 2. The client sends the CREATE packet to the server
 3. The server checks and verifies if the ID is not taken and the authentication is correct. If so, the server creates the bucket
-4. If the bucket id is already taken the server sends [error code](./index.md#response-codes) #41. 
+4. If the bucket id is already taken the server sends [error code](./error.md#error-codes) #41. 
 5. The server subscribes the user to the bucket if flag #6 is set and optionally to a specific range
 6. The server sends the empty CREATE response.
 
