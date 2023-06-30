@@ -127,6 +127,7 @@ These two keys are generated because it is not secure to reuse keys with the sam
 
 ### Counters
 The client and the server both keep two counters which are stored in a 2-byte unsigned integer (uint-16) each, a **client counter** and a **server counter**. These counters are used as a _nonce_ in the Key Derivation Function (KDF) to generate a shared secret that differs every time and to keep track on requests/responses. To encrypt the data or create a MAC the counters are used to [generate a key](#mac-and-encryption-keys). A client or server always uses his own counter when sending a message to the other party. Because they both keep the two counters, the counter of the other party is also known. After each message sent to the other party own counter is incremented. After each message that is received from the other party, the other counter is incremented, so a counter increments after the processing of a message.
+> In the [CONNECT](./connect.md)-handshake, the counters are **not** incremented, because no key or MAC is used because the key-exchange isn't finished yet.
 
 #### Counter overflow
 If a counter reaches the maximum value _65535_ (because it is an u16), the connection must be closed because we don't want the risk of reusing encryption keys. The client needs to reconnect to the server.
